@@ -1,26 +1,106 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* 
+    COLOR SYSTEM: Personal Digital Library 
+    A palette inspired by Victorian libraries, aged paper, and polished wood.
+  */
+
+  /* Backgrounds */
+  --color-walnut: #3E2723;
+  /* Deep wood background */
+  --color-saddle-brown: #5D4037;
+  /* Leather binding/Spine */
+  --color-parchment: #FDF6E3;
+  /* Pages */
+  --color-parchment-dim: #F5F5DC;
+  /* Page shadows */
+
+  /* Text */
+  --color-ink: #2D2013;
+  /* Primary Text */
+  --color-ink-faded: #5D4037;
+  /* Secondary Text */
+
+  /* Accents */
+  --color-gold: #DAA520;
+  /* Gold leaf accents */
+  --color-gold-dim: #B8860B;
+  /* Muted gold for borders */
+  --color-crimson: #800000;
+  /* Bookmark ribbons / Errors */
+
+  /* Functional */
+  --color-focus: #DAA520;
+  /* High viz focus ring */
+
+  /* Typography */
+  --font-serif: "Crimson Text", serif;
+  --font-mono: "Courier Prime", monospace;
+
+  /* Shadows */
+  --shadow-book:
+    0 20px 30px -10px rgba(0, 0, 0, 0.5),
+    0 10px 10px -5px rgba(0, 0, 0, 0.3),
+    inset 0 0 40px rgba(0, 0, 0, 0.1);
+
+  --shadow-page:
+    1px 0 5px rgba(0, 0, 0, 0.1),
+    -1px 0 5px rgba(0, 0, 0, 0.1);
+
+  /* Spacing */
+  --radius-book: 12px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer utilities {
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Texture: Paper Grain/Noise */
+  .texture-paper {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+  }
+
+  /* Texture: Wood Grain (CSS Pattern) */
+  .texture-wood {
+    background: repeating-linear-gradient(45deg,
+        #3E2723,
+        #3E2723 10px,
+        #2e1d1a 10px,
+        #2e1d1a 20px);
+  }
+
+  /* Utility: Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--color-gold-dim);
+    border-radius: 20px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+
+  *,
+  ::after,
+  ::before {
+    border-color: var(--color-gold-dim);
+  }
+
+  body {
+    background-color: var(--color-walnut);
+    color: var(--color-ink);
+    font-family: var(--font-serif);
+    overflow-x: hidden;
+  }
+
+  /* Interactive Elements Focus Strings */
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
 }
