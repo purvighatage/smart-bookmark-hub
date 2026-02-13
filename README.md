@@ -67,17 +67,17 @@ A simple, secure, and real-time bookmark manager built with **Next.js**, **Supab
 
 During the development and deployment of this project, I encountered and solved the following issues:
 
-### 1. Next.js 16 Middleware Build Error
-**Problem:** The deployment failed with `Error: Turbopack build failed... Proxy is missing expected function export name`.
-**Context:** Next.js 16 changed how middleware functions are identified. The file `src/proxy.ts` was exporting a function named `middleware`, which is no longer the expected default.
-**Solution:** I renamed the exported function in `src/proxy.ts` from `middleware` to `proxy` to align with the new Next.js 16 requirements.
+### 1. Next.js 16 Middleware Architecture Changes
+**Problem:** The application build process failed due to strict export validation in the Next.js 16 Edge Runtime.
+**Technical Context:** Next.js 16 introduced breaking changes to how middleware is resolved. The previously standard named export `middleware` in `src/proxy.ts` is no longer recognized as a valid entry point, causing Turbopack build failures.
+**Solution:** I refactored the entry point to export the function as `proxy`, adhering to the updated Next.js routing specifications and ensuring correct middleware invocation during the request lifecycle.
 
-### 2. Vercel 500 Internal Server Error (Missing Env Vars)
-**Problem:** After a successful build, the deployed application crashed with a "500 Internal Server Error".
-**Context:** The middleware (`src/utils/supabase/middleware.ts`) was using non-null assertions (`!`) to access environment variables. On Vercel, if these variables were missing (which they were initially), the server-side code threw an exception, crashing the entire app.
-**Solution:** I implemented a safety check in the middleware. Instead of crashing, the code now checks if `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` exist. If they are missing, it logs an error and allows the request to proceed (bypassing auth), which prevents the 500 error and makes debugging easier.
+### 2. Edge Runtime Defensive Programming
+**Problem:** Unhandled exceptions during the initialization of the Supabase SSR client in the Edge Middleware could cause catastrophic 500 errors.
+**Technical Context:** The middleware operates in the Edge Runtime, where strict error handling is critical. Initializing the `createServerClient` with potentially `undefined` environment variables (due to configuration drift) led to immediate runtime crashes before the request could be processed.
+**Solution:** I implemented robust null-guard checking within the middleware logic. The system now validates the presence of critical configuration (`Supabase URL` and `Anon Key`) before attempting client instantiation. If configuration is missing, it gracefully degrades by bypassing the auth layer and logging a structured error, maintaining application availability.
 
-### 3. Environment Variable Naming Inconsistency
-**Problem:** The codebase was using a non-standard environment variable name: `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`.
-**Context:** This naming convention was inconsistent with standard documentation and deployment instructions, leading to potential confusion when setting up the project on Vercel.
-**Solution:** I refactored the entire codebase (Client, Server, Middleware, and Auth Route) to use the standard `NEXT_PUBLIC_SUPABASE_ANON_KEY`. I then updated the `.env.local` file and the documentation to match.
+### 3. Cross-Environment Configuration Standardization
+**Problem:** Inconsistent environment variable nomenclature created friction between Client-side and Server-side contexts.
+**Technical Context:** The codebase initially used a non-standard key (`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`), which deviated from the industry-standard `NEXT_PUBLIC_SUPABASE_ANON_KEY` expected by Supabase client libraries and infrastructure-as-code patterns.
+**Solution:** I executed a codebase-wide refactor to standardize on `NEXT_PUBLIC_SUPABASE_ANON_KEY`. This involved updating the Singleton client initialization, Server Component patterns, and Auth Route Handlers to ensure a unified configuration source of truth across the full stack.
