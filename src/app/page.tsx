@@ -1,7 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
-import SigninPage from '@/app/auth/signin/page';
-import { BookLayout } from '@/components/library/BookLayout'
+import { redirect } from 'next/navigation'
 
 export default async function Home() {
     const cookieStore = await cookies()
@@ -11,15 +10,11 @@ export default async function Home() {
         data: { user },
     } = await supabase.auth.getUser()
 
-    if (!user) {
-        return <SigninPage />
+    if (user) {
+        redirect('/dashboard')
+    } else {
+        redirect('/auth/signin')
     }
-
-    const { data: bookmarks } = await supabase
-        .from('bookmarks')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-    return <BookLayout initialBookmarks={bookmarks || []} user={user} />
 }
+
 

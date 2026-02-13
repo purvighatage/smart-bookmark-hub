@@ -21,7 +21,7 @@ export function useBookmarks(initialBookmarks: Bookmark[]) {
         setBookmarks(initialBookmarks)
 
         const channel = supabase
-            .channel('realtime bookmarks')
+            .channel(`realtime-bookmarks-${Date.now()}`)
             .on(
                 'postgres_changes',
                 {
@@ -30,20 +30,20 @@ export function useBookmarks(initialBookmarks: Bookmark[]) {
                     table: 'bookmarks',
                 },
                 (payload: any) => {
-                    console.log('Real-time payload received:', payload);
                     if (payload.eventType === 'INSERT') {
-                        setBookmarks((prev) => [payload.new as Bookmark, ...prev]);
+                        setBookmarks((prev) => {
+                            // Dedupe
+                            if (prev.find(b => b.id == payload.new.id)) return prev;
+                            return [payload.new as Bookmark, ...prev];
+                        });
                     } else if (payload.eventType === 'DELETE') {
-                        setBookmarks((prev) => prev.filter((bookmark) => bookmark.id !== payload.old.id));
+                        setBookmarks((prev) => prev.filter((bookmark) => bookmark.id != payload.old.id));
                     } else if (payload.eventType === 'UPDATE') {
-                        setBookmarks((prev) => prev.map((b) => b.id === payload.new.id ? payload.new as Bookmark : b));
+                        setBookmarks((prev) => prev.map((b) => b.id == payload.new.id ? payload.new as Bookmark : b));
                     }
                 }
             )
             .subscribe((status: any) => {
-                if (status === 'SUBSCRIBED') {
-                    console.log('Real-time connection established for bookmarks.');
-                }
                 if (status === 'CHANNEL_ERROR') {
                     console.error('Real-time connection failed.');
                 }

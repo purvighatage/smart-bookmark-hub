@@ -22,7 +22,7 @@ export default async function RecommendedPage() {
                 <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-4 border-[var(--color-saddle-brown)] pb-6 shadow-sm bg-[var(--color-parchment)] p-8 rounded-t-lg rounded-b-sm texture-paper">
                     <div>
                         <Link
-                            href="/"
+                            href="/dashboard"
                             className="inline-flex items-center gap-2 text-[var(--color-saddle-brown)] hover:text-[var(--color-crimson)] font-serif font-bold mb-4 transition-colors"
                         >
                             <ArrowLeft className="w-4 h-4" />

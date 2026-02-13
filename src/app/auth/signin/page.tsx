@@ -1,7 +1,21 @@
 import { MythicFrame } from '@/components/ui/MythicFrame';
 import { DustParticles } from '@/components/effects/DustParticles';
+import { createClient } from '@/utils/supabase/server';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-export default function SigninPage() {
+export default async function SigninPage() {
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
+
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+        redirect('/dashboard');
+    }
+
     return (
         <main className="relative min-h-screen w-full flex items-center justify-center overflow-auto bg-[#0F0A06] text-[#EBE5CE]">
 

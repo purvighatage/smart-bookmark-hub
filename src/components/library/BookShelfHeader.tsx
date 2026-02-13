@@ -16,7 +16,8 @@ export const BookShelfHeader = ({ userEmail, onSearch, searchQuery }: BookShelfH
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
-        router.push('/login');
+        router.push('/');
+        router.refresh(); // Ensure server state is cleared
     };
 
     return (

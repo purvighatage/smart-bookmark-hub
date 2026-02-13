@@ -11,7 +11,8 @@ export const ProfileActions = () => {
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
-        router.push('/login');
+        router.push('/');
+        router.refresh();
     };
 
     return (
@@ -22,7 +23,7 @@ export const ProfileActions = () => {
             className="flex gap-4"
         >
             <button
-                onClick={() => router.push('/')}
+                onClick={() => router.push('/dashboard')}
                 className="px-6 py-3 border-2 border-[var(--color-saddle-brown)] text-[var(--color-saddle-brown)] font-bold font-serif rounded hover:bg-[var(--color-saddle-brown)] hover:text-[var(--color-parchment)] transition-all flex items-center gap-2"
             >
                 <ArrowLeft className="w-4 h-4" />
